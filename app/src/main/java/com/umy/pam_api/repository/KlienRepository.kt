@@ -28,7 +28,7 @@ class NetworkKlienRepository(private val klienService: KlienService)
         try {
             val response = klienService.deleteKlien(id_klien)
             if (!response.isSuccessful) {
-                throw Exception("Failed to delete lokasi. HTTP Status Code: ${response.code()}")
+                throw Exception("Failed to delete klien. HTTP Status Code: ${response.code()}")
             }
             else{
                 response.message()
