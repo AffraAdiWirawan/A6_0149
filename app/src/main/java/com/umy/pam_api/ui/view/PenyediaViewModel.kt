@@ -12,6 +12,7 @@ import com.umy.pam_api.ui.viewmodel.VendorHomeVM.VendorInsertVM
 import com.umy.pam_api.ui.viewmodel.VendorHomeVM.VendorUpdateVM
 import com.umy.pam_api.ui.viewmodel.acaraviewmodel.AcaraDetailViewModel
 import com.umy.pam_api.ui.viewmodel.acaraviewmodel.AcaraInsertVM
+import com.umy.pam_api.ui.viewmodel.acaraviewmodel.AcaraUpdateVM
 import com.umy.pam_api.ui.viewmodel.acaraviewmodel.AcaraViewModel
 import com.umy.pam_api.ui.viewmodel.klienviewmodel.KlienDetailVM
 import com.umy.pam_api.ui.viewmodel.klienviewmodel.KlienHomeVM
@@ -41,6 +42,11 @@ object PenyediaViewModel{
         }
         initializer {
             AcaraInsertVM(
+                MahasiswaApplication().container.acaraRepository, MahasiswaApplication().container.lokasiRepository, MahasiswaApplication().container.klienRepository)
+        }
+        initializer {
+            AcaraUpdateVM(
+                createSavedStateHandle(),
                 MahasiswaApplication().container.acaraRepository, MahasiswaApplication().container.lokasiRepository, MahasiswaApplication().container.klienRepository)
         }
         initializer {

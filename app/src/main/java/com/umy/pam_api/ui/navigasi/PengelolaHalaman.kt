@@ -11,8 +11,10 @@ import androidx.navigation.navArgument
 import com.umy.pam_api.HomeApp
 import com.umy.pam_api.ui.view.acara.AcaraDetailScreen
 import com.umy.pam_api.ui.view.acara.AcaraScreen
+import com.umy.pam_api.ui.view.acara.AcaraUpdateView
 import com.umy.pam_api.ui.view.acara.DestinasiDetailAcara
 import com.umy.pam_api.ui.view.acara.DestinasiInsertAcara
+import com.umy.pam_api.ui.view.acara.DestinasiUpdateAcara
 import com.umy.pam_api.ui.view.acara.EntryAcaraScreen
 import com.umy.pam_api.ui.view.klien.DestinasiEntryKlien
 import com.umy.pam_api.ui.view.klien.DestinasiUpdateKlien
@@ -98,8 +100,29 @@ fun PengelolaHalaman(
                         }
                     },
                     navigateToEdit = {
-//                        navController.navigate("${DestinasiUpdateVendor.route}/$it")
+                        navController.navigate("${DestinasiUpdateAcara.route}/$it")
                     }
+                )
+            }
+        }
+        composable(
+            DestinasiUpdateAcara.routeWithArg,
+            arguments = listOf(
+                navArgument(DestinasiUpdateAcara.ID_ACARA) {
+                    type = NavType.StringType
+                }
+            )
+        ) {
+            val id_acara = it.arguments?.getString(DestinasiUpdateAcara.ID_ACARA)
+            id_acara?.let {
+                AcaraUpdateView(
+                    navigateBack = {
+                        navController.navigate("${DestinasiDetailAcara.route}/$it") {
+                            popUpTo("${DestinasiDetailAcara.route}/$it") {
+                                inclusive = true
+                            }
+                        }
+                    },
                 )
             }
         }

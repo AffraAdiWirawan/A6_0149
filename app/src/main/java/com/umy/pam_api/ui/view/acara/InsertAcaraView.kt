@@ -55,7 +55,7 @@ fun EntryAcaraScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = "Daftar Sesi",
+                            text = "Daftar Acara",
                             style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
                             color = Color.Black
                         )
