@@ -31,14 +31,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import androidx.compose.foundation.clickable
 import com.umy.pam_api.model.Acara
-import com.umy.pam_api.model.Klien
 import com.umy.pam_api.ui.navigasi.DestinasiNavigasi
-import com.umy.pam_api.ui.view.PenyediaViewModel
 import com.umy.pam_api.ui.viewmodel.acaraviewmodel.AcaraDetailViewModel
 import com.umy.pam_api.ui.viewmodel.acaraviewmodel.AcaraUiEvent
 import com.umy.pam_api.ui.viewmodel.acaraviewmodel.DetailAcaraUiState
-
+import com.umy.pam_api.ui.view.PenyediaViewModel
 
 object DestinasiDetailAcara : DestinasiNavigasi {
     override val route = "detail acara"
@@ -52,6 +52,8 @@ object DestinasiDetailAcara : DestinasiNavigasi {
 fun AcaraDetailScreen(
     navigateBack: () -> Unit,
     navigateToEdit: () -> Unit,
+    navigateToDaftarLokasi: (String) -> Unit, // Navigasi ke daftar lokasi
+    navigateToDetailKlien: (String) -> Unit, // Navigasi ke detail klien
     modifier: Modifier = Modifier,
     viewModel: AcaraDetailViewModel = viewModel(factory = PenyediaViewModel.Factory)
 ) {
@@ -63,9 +65,9 @@ fun AcaraDetailScreen(
                 title = {
                     Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                         Text(
-                            text = "Detail Acara",  // Set title text
+                            text = "Detail Acara",
                             style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
-                            color = Color.Black,  // Set blue color
+                            color = Color.Black
                         )
                     }
                 },
@@ -82,8 +84,7 @@ fun AcaraDetailScreen(
                         Icon(imageVector = Icons.Default.Refresh, contentDescription = "Refresh")
                     }
                 },
-                scrollBehavior = scrollBehavior,
-                // Add elevation to give it a shadow effect
+                scrollBehavior = scrollBehavior
             )
         },
         floatingActionButton = {
@@ -101,6 +102,8 @@ fun AcaraDetailScreen(
     ) { innerPadding ->
         BodyDetailAcr(
             detailAcaraUiState = viewModel.detailAcaraUiState,
+            navigateToDaftarLokasi = navigateToDaftarLokasi, // Pass navigasi lokasi
+            navigateToDetailKlien = navigateToDetailKlien, // Pass navigasi klien
             modifier = Modifier.padding(innerPadding)
         )
     }
@@ -110,7 +113,9 @@ fun AcaraDetailScreen(
 @Composable
 fun BodyDetailAcr(
     detailAcaraUiState: DetailAcaraUiState,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    navigateToDaftarLokasi: (String) -> Unit, // Navigasi lokasi
+    navigateToDetailKlien: (String) -> Unit // Navigasi klien
 ) {
     when {
         detailAcaraUiState.isLoading -> {
@@ -143,12 +148,21 @@ fun BodyDetailAcr(
             ) {
                 ItemDetailAcr(
                     acara = detailAcaraUiState.detailAcaraUiEvent.toAcr(),
-                    modifier = modifier
+                    modifier = modifier,
+                    onLokasiClick = {
+                        // Navigate to daftar lokasi using the id_lokasi
+                        navigateToDaftarLokasi(detailAcaraUiState.detailAcaraUiEvent.toAcr().id_lokasi)
+                    },
+                    onKlienClick = {
+                        // Navigate to detail klien using the id_klien
+                        navigateToDetailKlien(detailAcaraUiState.detailAcaraUiEvent.toAcr().id_klien)
+                    }
                 )
             }
         }
     }
 }
+
 
 fun AcaraUiEvent.toAcr(): Acara = Acara(
     id_acara = id_acara,
@@ -165,6 +179,8 @@ fun AcaraUiEvent.toAcr(): Acara = Acara(
 fun ItemDetailAcr(
     modifier: Modifier = Modifier,
     acara: Acara,
+    onLokasiClick: () -> Unit, // Tautkan klik ID Lokasi
+    onKlienClick: () -> Unit // Tautkan klik ID Klien
 ) {
     Card(
         modifier = modifier
@@ -190,9 +206,9 @@ fun ItemDetailAcr(
             Spacer(modifier = Modifier.padding(8.dp))
             ComponentDetailAcr(judul = "Tanggal Berakhir", isinya = acara.tanggal_berakhir)
             Spacer(modifier = Modifier.padding(8.dp))
-            ComponentDetailAcr(judul = "ID Lokasi", isinya = acara.id_lokasi)
+            ComponentDetailAcr(judul = "ID Lokasi", isinya = acara.id_lokasi, onLokasiClick = onLokasiClick) // Tautkan klik
             Spacer(modifier = Modifier.padding(8.dp))
-            ComponentDetailAcr(judul = "ID Klien", isinya = acara.id_klien)
+            ComponentDetailAcr(judul = "ID Klien", isinya = acara.id_klien, onLokasiClick = onKlienClick) // Tautkan klik ke Klien
             Spacer(modifier = Modifier.padding(8.dp))
             ComponentDetailAcr(judul = "Status Acara", isinya = acara.status_acara)
             Spacer(modifier = Modifier.padding(8.dp))
@@ -200,11 +216,13 @@ fun ItemDetailAcr(
     }
 }
 
+
 @Composable
 fun ComponentDetailAcr(
     modifier: Modifier = Modifier,
     judul: String,
-    isinya: String
+    isinya: String,
+    onLokasiClick: (() -> Unit)? = null // Optional: Menangani klik ID Lokasi atau Klien
 ) {
     Column(
         modifier = modifier.fillMaxWidth(),
@@ -220,12 +238,36 @@ fun ComponentDetailAcr(
         Spacer(modifier = Modifier.height(4.dp))
 
         // Content with black color for better readability
-        Text(
-            text = isinya,
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.Black // Black color for content text
-        )
+        if (judul == "ID Lokasi" && onLokasiClick != null) {
+            // Buat teks ID Lokasi menjadi clickable
+            Text(
+                text = isinya,
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.Blue, // Ubah warna menjadi biru agar terlihat seperti link
+                modifier = Modifier.clickable {
+                    onLokasiClick() // Menangani klik
+                }
+            )
+        } else if (judul == "ID Klien" && onLokasiClick != null) {
+            // Buat teks ID Klien menjadi clickable
+            Text(
+                text = isinya,
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.Blue, // Ubah warna menjadi biru agar terlihat seperti link
+                modifier = Modifier.clickable {
+                    onLokasiClick() // Menangani klik untuk Klien
+                }
+            )
+        } else {
+            Text(
+                text = isinya,
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.Black // Black color for content text
+            )
+        }
     }
 }
 
