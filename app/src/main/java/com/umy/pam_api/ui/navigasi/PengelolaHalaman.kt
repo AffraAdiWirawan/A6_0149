@@ -101,10 +101,17 @@ fun PengelolaHalaman(
                     },
                     navigateToEdit = {
                         navController.navigate("${DestinasiUpdateAcara.route}/$it")
+                    },
+                    navigateToDaftarLokasi = {
+                        navController.navigate("${DestinasiLokasi.route}")
+                    },
+                    navigateToDetailKlien = {
+                        navController.navigate("${DestinasiKlien.route}")
                     }
                 )
             }
         }
+
         composable(
             DestinasiUpdateAcara.routeWithArg,
             arguments = listOf(
